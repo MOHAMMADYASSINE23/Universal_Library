@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Header from "@/components/Header";
-import { Session } from "inspector/promises";
-import { redirect } from "next/dist/server/api-utils";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
@@ -11,7 +11,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
   return (
     <main className="root-container">
       <div className="mx-auto max-w-7xl">
-        <Header session={Session} />
+        <Header session={session} />
 
         <div className="mt-20 pb-20">{children}</div>
       </div>
