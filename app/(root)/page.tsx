@@ -1,14 +1,17 @@
 import BookList from "@/components/BookList";
 import BookOverview from "@/components/BookOverview";
 import { sampleBooks } from "@/constants";
+import { db } from "@/database/drizzle";
+import { users } from "@/database/schema";
 
 const Home = async () => {
-  const book = sampleBooks[0]; // Use first book for overview
+  const result = await db.select().from(users);
+  console.log(JSON.stringify(result, null, 2));
   return (
     <>
-      <BookOverview {...book} userId="user123" />
+      <BookOverview {...sampleBooks[0]} userId="" />
 
-      <BookList title="Popular Books" books={sampleBooks} />
+      <BookList title="Popular Books" books={sampleBooks} containerClassName="mt-28" />
     </>
   );
 }
