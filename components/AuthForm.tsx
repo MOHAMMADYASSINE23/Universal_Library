@@ -24,7 +24,6 @@ import {
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
-import FileUpload from "@/components/FileUpload";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -71,12 +70,12 @@ const AuthForm = <T extends FieldValues>({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-semibold text-white">
-        {isSignIn ? "Welcome back to BookWise" : "Create your library account"}
+        {isSignIn ? "Welcome back to Universal Library" : "Create your library account"}
       </h1>
       <p className="text-light-100">
         {isSignIn
           ? "Access the vast collection of resources, and stay updated"
-          : "Please complete all fields and upload a valid university ID to gain access to the library"}
+          : "Please complete all fields to gain access to the library"}
       </p>
       <Form {...form}>
         <form
@@ -94,25 +93,14 @@ const AuthForm = <T extends FieldValues>({
                     {FIELD_NAMES[field.name as keyof typeof FIELD_NAMES]}
                   </FormLabel>
                   <FormControl>
-                    {field.name === "universityCard" ? (
-                      <FileUpload
-                        type="image"
-                        accept="image/*"
-                        placeholder="Upload your ID"
-                        folder="ids"
-                        variant="dark"
-                        onFileChange={field.onChange}
-                      />
-                    ) : (
-                      <Input
-                        required
-                        type={
-                          FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]
-                        }
-                        {...field}
-                        className="form-input"
-                      />
-                    )}
+                    <Input
+                      required
+                      type={
+                        FIELD_TYPES[field.name as keyof typeof FIELD_TYPES]
+                      }
+                      {...field}
+                      className="form-input"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -127,7 +115,7 @@ const AuthForm = <T extends FieldValues>({
       </Form>
 
       <p className="text-center text-base font-medium">
-        {isSignIn ? "New to BookWise? " : "Already have an account? "}
+        {isSignIn ? "New to Universal Library? " : "Already have an account? "}
 
         <Link
           href={isSignIn ? "/sign-up" : "/sign-in"}

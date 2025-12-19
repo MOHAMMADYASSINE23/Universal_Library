@@ -45,8 +45,19 @@ export const { POST } = serve<InitialData>(async (context) => {
   await context.run("new-signup", async () => {
     await sendEmail({
       email,
-      subject: "Welcome to the platform",
-      message: `Welcome ${fullName}!`,
+      subject: "Welcome to Universal Library",
+      message: `Dear ${fullName},
+
+Welcome to Universal Library! We're excited to have you join our community of book lovers.
+
+You can now browse our extensive collection of books, borrow titles, and manage your reading journey.
+
+If you have any questions, feel free to reach out to our support team.
+
+Happy reading!
+
+Best regards,
+The Universal Library Team`,
     });
   });
 
@@ -61,16 +72,36 @@ export const { POST } = serve<InitialData>(async (context) => {
       await context.run("send-email-non-active", async () => {
         await sendEmail({
           email,
-          subject: "Are you still there?",
-          message: `Hey ${fullName}, we miss you!`,
+          subject: "We Miss You at Universal Library",
+          message: `Dear ${fullName},
+
+We noticed you haven't visited Universal Library in a few days. We hope everything is going well!
+
+Remember, you have access to thousands of books waiting for you. Log in anytime to continue your reading journey or discover new titles.
+
+If you have any issues with your account, please let us know.
+
+We're here to help!
+
+Best regards,
+The Universal Library Team`,
         });
       });
     } else if (state === "active") {
       await context.run("send-email-active", async () => {
         await sendEmail({
           email,
-          subject: "Welcome back!",
-          message: `Welcome back ${fullName}!`,
+          subject: "Welcome Back to Universal Library!",
+          message: `Dear ${fullName},
+
+Great to see you back at Universal Library! We're glad you're continuing your reading adventure with us.
+
+Check out our latest book recommendations or continue reading your borrowed books.
+
+Happy reading!
+
+Best regards,
+The Universal Library Team`,
         });
       });
     }

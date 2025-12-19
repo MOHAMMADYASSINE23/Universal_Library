@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import Header from "@/components/Header";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import ActivityTracker from "@/components/ActivityTracker";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
@@ -15,6 +16,8 @@ const Layout = async ({ children }: { children: ReactNode }) => {
 
         <div className="mt-20 pb-20">{children}</div>
       </div>
+
+      <ActivityTracker />
     </main>
   );
 };

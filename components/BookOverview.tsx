@@ -2,9 +2,9 @@ import React from "react";
 import Image from "next/image";
 import BookCover from "@/components/BookCover";
 import BorrowBook from "@/components/BorrowBook";
-/*import { db } from "@/database/drizzle";
+import { db } from "@/database/drizzle";
 import { users } from "@/database/schema";
-import { eq } from "drizzle-orm";*/
+import { eq } from "drizzle-orm";
 interface Props extends Book {
   userId: string;
 }
@@ -21,7 +21,7 @@ const BookOverview = async ({
   id,
   userId,
 }: Props) => {
-  /*const [user] = await db
+  const [user] = await db
     .select()
     .from(users)
     .where(eq(users.id, userId))
@@ -33,7 +33,7 @@ const BookOverview = async ({
       availableCopies <= 0
         ? "Book is not available"
         : "You are not eligible to borrow this book",
-  };*/
+  };
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5 xl:order-1">
@@ -66,8 +66,7 @@ const BookOverview = async ({
         </div>
 
         <p className="book-description">{description}</p>
-
-        <BorrowBook />
+        {user &&(<BorrowBook bookId={id} userId={userId} borrowingEligibility={borrowingEligibility} />)}
 
       </div>
 

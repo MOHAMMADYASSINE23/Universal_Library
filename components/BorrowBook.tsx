@@ -1,19 +1,73 @@
-import { Button } from "./ui/button";
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
+import { borrowBook } from "@/lib/actions/book";
+
 
 interface Props {
-  isLoanedBook?: boolean;
+  userId: string;
+  bookId: string;
+  borrowingEligibility: {
+    isEligible: boolean;
+    message: string;
+  };
 }
 
-const BorrowBook = ({ isLoanedBook = false }: Props) => {
+const BorrowBook = ({ userId, bookId, borrowingEligibility:{ isEligible, message}, }: Props) => {
+  const router = useRouter();
+  const [borrowing, setBorrowing] = useState(false);
+
+  const handleBorrowBook = async () => {
+    if (!isEligible) {
+      toast({
+        title: "Error",
+        description: message,
+        variant: "destructive",
+      });
+    }
+    setBorrowing(true);
+
+    try {
+      const result = await borrowBook({ bookId, userId});
+
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "You have successfully borrowed the book.",
+        });
+        router.push("/");
+      } else {
+        toast({
+          title: "Error",
+          description: result.error,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setBorrowing(false);
+    }
+  };
+    
   return (
-    <Button className="book-overview_btn flex-row h-8 py-1 px-8 items-center gap-3">
-      <div className="flex items-center justify-center gap-3">
-        <Image src="/icons/book.svg" alt="book" width={20} height={20} />
-        <p className="book-overview_btn-text">
-          {isLoanedBook ? "Download receipt" : "Borrow Book"}
-        </p>
-      </div>
+    <Button
+      className="book-overview_btn"
+      onClick={handleBorrowBook}
+      disabled={borrowing}
+    >
+      <Image src="/icons/book.svg" alt="book" width={20} height={20} />
+      <p className="font-bebas-neue text-xl text-dark-100">
+        {borrowing ? "Borrowing ..." : "Borrow Book"}
+      </p>
     </Button>
   );
 };

@@ -8,7 +8,7 @@ import { signIn } from "@/auth";
 import { headers } from "next/headers";
 import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
-import { workflowClient } from "@/lib/workflow";
+import { workflowClient } from "@upstash/workflow/nextjs";
 import config from "@/lib/config";
 
 export const signInWithCredentials = async ( params: Pick<AuthCredentials, "email" | "password">,) => {
@@ -36,7 +36,7 @@ export const signInWithCredentials = async ( params: Pick<AuthCredentials, "emai
 };
 
 export const signUp = async (params: AuthCredentials) => {
-    const { fullName, email, password, universityId, universityCard } = params;
+     const { fullName, email, password } = params;
 
      const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
      const { success } = await ratelimit.limit(ip);
@@ -59,9 +59,7 @@ export const signUp = async (params: AuthCredentials) => {
         await db.insert(users).values({
             fullName,
             email,
-            universityId,
             password: hashedPassword,
-            universityCard,
         });
 
         await workflowClient.trigger({
