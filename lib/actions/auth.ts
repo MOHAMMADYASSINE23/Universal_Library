@@ -8,7 +8,7 @@ import { signIn } from "@/auth";
 import { headers } from "next/headers";
 import ratelimit from "@/lib/ratelimit";
 import { redirect } from "next/navigation";
-import { workflowClient } from "@upstash/workflow/nextjs";
+import { workflowClient } from "@/lib/workflow";
 import config from "@/lib/config";
 
 export const signInWithCredentials = async ( params: Pick<AuthCredentials, "email" | "password">,) => {
@@ -62,10 +62,15 @@ export const signUp = async (params: AuthCredentials) => {
             password: hashedPassword,
         });
 
-        await workflowClient.trigger({
-            url: `${config.env.prodApiEndpoint}/api/workflows/onboarding`,
-            body: { email, fullName,},
-        });
+        try {
+            await workflowClient.trigger({
+                url: `${config.env.prodApiEndpoint}/api/auth/workflows/onboarding`,
+                body: { email, fullName,},
+            });
+        } catch (error) {
+            console.log("Workflow trigger failed:", error);
+            // Don't fail signup if workflow fails
+        }
 
         await signInWithCredentials({ email, password });
 
