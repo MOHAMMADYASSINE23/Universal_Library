@@ -26,3 +26,9 @@ export const bookSchema = z.object({
   videoUrl: z.string().nonempty(),
   summary: z.string().trim().min(10),
 });
+
+export const bookReviewSchema = z.object({
+  bookId: z.string().uuid(),
+  rating: z.coerce.number().int().min(1).max(5),
+  review: z.string().trim().min(10).max(1200),
+});

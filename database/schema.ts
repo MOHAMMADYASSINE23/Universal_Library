@@ -7,6 +7,10 @@ import {
   date,
   pgEnum,
   timestamp,
+  uniqueIndex,
+  index,
+  check,
+  sql,
 } from "drizzle-orm/pg-core";
 
 export const STATUS_ENUM = pgEnum("status", [
@@ -67,3 +71,17 @@ export const borrowRecords = pgTable("borrow_records", {
   status: BORROW_STATUS_ENUM("status").default("BORROWED").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
+
+export const bookReviews = pgTable("book_reviews", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  bookId: uuid("book_id").notNull().references(() => books.id, { onDelete: "cascade" }),
+  rating: integer("rating").notNull(),
+  review: text("review").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  oneReviewPerReader: uniqueIndex("book_reviews_user_book_unique").on(table.userId, table.bookId),
+  byBook: index("book_reviews_book_id_idx").on(table.bookId),
+  ratingRange: check("book_reviews_rating_check", sql`${table.rating} BETWEEN 1 AND 5`),
+}));
