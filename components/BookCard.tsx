@@ -12,7 +12,8 @@ const BookCard = ({
   coverColor,
   coverUrl,
   isLoanedBook = false,
-}: Book) => (
+  recommendationReason,
+}: Book & { recommendationReason?: string }) => (
   <li className={cn(isLoanedBook && "xs:w-52 w-full")}>
     <Link
       href={`/books/${id}`}
@@ -23,6 +24,7 @@ const BookCard = ({
       <div className={cn("mt-4", !isLoanedBook && "xs:max-w-40 max-w-28")}>
         <p className="book-title">{title}</p>
         <p className="book-genre">{genre}</p>
+        {recommendationReason && <p className="mt-2 max-w-40 text-xs leading-4 text-primary">{recommendationReason}</p>}
       </div>
 
       {isLoanedBook && (
