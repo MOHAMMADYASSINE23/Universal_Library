@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import FileUpload from "@/components/FileUpload";
 import ColorPicker from "@/components/admin/ColorPicker";
-import { createBook } from "@/lib/admin/actions/book";
+import { createBook, updateBook } from "@/lib/admin/actions/book";
 import { toast } from "@/hooks/use-toast";
 
 
@@ -33,29 +33,31 @@ const BookForm = ({ type, ...book }: Props) => {
   const form = useForm<z.infer<typeof bookSchema>>({
     resolver: zodResolver(bookSchema) as Resolver<z.infer<typeof bookSchema>>,
     defaultValues: {
-      title: "",
-      description: "",
-      author: "",
-      genre: "",
-      rating: 1,
-      totalCopies: 1,
-      coverUrl: "",
-      coverColor: "",
-      videoUrl: "",
-      summary: "",
+      title: book.title ?? "",
+      description: book.description ?? "",
+      author: book.author ?? "",
+      genre: book.genre ?? "",
+      rating: book.rating ?? 1,
+      totalCopies: book.totalCopies ?? 1,
+      coverUrl: book.coverUrl ?? "",
+      coverColor: book.coverColor ?? "#ffffff",
+      videoUrl: book.videoUrl ?? "",
+      summary: book.summary ?? "",
     },
   });
 
   const onSubmit = async (value: z.infer<typeof bookSchema>) => {
-    const result = await createBook(value);
+    const result = type === "update" && book.id
+      ? await updateBook(book.id, value)
+      : await createBook(value);
 
     if (result.success) {
       toast({
         title: "success",
-        description: "Book created successfully",
+        description: type === "update" ? "Book updated successfully" : "Book created successfully",
       });
 
-      router.push(`/admin/books/${result.data.id}`);
+      router.push(`/books/${result.data.id}`);
     } else {
       toast({
         title: "Error",
@@ -141,6 +143,7 @@ const BookForm = ({ type, ...book }: Props) => {
               <FormControl>
                 <Input
                   type="number"
+                  step={1}
                   min={1}
                   max={5}
                   placeholder="Book rating"
@@ -282,7 +285,7 @@ const BookForm = ({ type, ...book }: Props) => {
         />
 
         <Button type="submit" className="book-form_btn text-white">
-          Add Book to Library
+          {type === "update" ? "Save Book Changes" : "Add Book to Library"}
         </Button>
       </form>
     </Form>

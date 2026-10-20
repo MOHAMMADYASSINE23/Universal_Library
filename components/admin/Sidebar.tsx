@@ -16,10 +16,11 @@ const Sidebar = ({ session }: { session: Session }) => {
             <div>
                 <div className="logo">
                     <Image
-                        src="/icpns/admin/logo.svg"
-                        alt="logo"
+                        src="/icons/admin/logo.svg"
+                        alt="Bookwise library logo"
                         height={37}
                         width={37}
+                        className="rounded-full shadow-sm ring-2 ring-primary-admin/15"
                         />
                         <h1>Bookwise</h1>
                 </div>
@@ -54,8 +55,8 @@ const Sidebar = ({ session }: { session: Session }) => {
       </div>
 
       <div className="user">
-        <Avatar>
-            <AvatarFallback className="bg-amber-100">
+        <Avatar className="size-10 border-2 border-primary-admin/20 bg-white shadow-sm">
+            <AvatarFallback className="bg-gradient-to-br from-primary-admin to-indigo-400 text-sm font-bold text-white">
                 {getInitials(session?.user?.name || "IN")}
             </AvatarFallback>
         </Avatar>

@@ -28,6 +28,7 @@ const BorrowBook = ({ userId, bookId, borrowingEligibility:{ isEligible, message
         description: message,
         variant: "destructive",
       });
+      return;
     }
     setBorrowing(true);
 
@@ -37,9 +38,9 @@ const BorrowBook = ({ userId, bookId, borrowingEligibility:{ isEligible, message
       if (result.success) {
         toast({
           title: "Success",
-          description: "You have successfully borrowed the book.",
+          description: "Your borrowing request has been sent for approval.",
         });
-        router.push("/");
+        router.push("/dashboard");
       } else {
         toast({
           title: "Error",

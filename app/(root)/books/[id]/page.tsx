@@ -2,13 +2,20 @@ import React from "react";
 import { db } from "@/database/drizzle";
 import { books } from "@/database/schema";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import BookOverview from "@/components/BookOverview";
 import BookVideo from "@/components/BookVideo";
 
 const Page = async ({ params }: { params: { id: string } }) => {
     const id = (await params).id;
+
+    // Book IDs are UUIDs in the database. Reject stale or malformed links
+    // before sending them to PostgreSQL, where an ID like "1" raises 22P02.
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+      notFound();
+    }
+
     const session = await auth();
 
     const [bookDetails] = await db 
@@ -17,7 +24,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
     .where(eq(books.id, id))
     .limit(1) as Book[];
 
-    if (!bookDetails) redirect("/404");
+    if (!bookDetails) notFound();
 
     return (
         <>
@@ -47,4 +54,3 @@ const Page = async ({ params }: { params: { id: string } }) => {
   );
 };
 export default Page;
-            
