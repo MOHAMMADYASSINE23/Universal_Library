@@ -86,7 +86,19 @@ Seed demo books if desired:
 npm run seed
 ```
 
-### 5. Start the app
+### 5. Create the first administrator
+
+Sign up normally, then promote your own trusted account from the Neon SQL editor (replace the example email). Do not make this query available to ordinary users or put database credentials in frontend code.
+
+```sql
+UPDATE users
+SET role = 'ADMIN', status = 'APPROVED'
+WHERE email = 'your-admin-email@example.com';
+```
+
+Only do this for an account you control. There is no public self-service administrator registration.
+
+### 6. Start the app
 
 ```bash
 npm run dev
