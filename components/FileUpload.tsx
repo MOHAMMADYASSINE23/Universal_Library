@@ -2,8 +2,7 @@
 
 import { IKImage, ImageKitProvider, IKUpload, IKVideo } from "imagekitio-next";
 import config from "@/lib/config";
-import ImageKit from "imagekit";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -37,6 +36,10 @@ const FileUpload = ( {
   const [file, setFile] = useState<{ filePath: string  | null }>({filePath: value ?? null,});
   const [progress, setProgress] = useState(0);
 
+  useEffect(() => {
+    setFile({ filePath: value ?? null });
+  }, [value]);
+
   const styles = {
     button:
     variant === "dark"
@@ -46,8 +49,8 @@ const FileUpload = ( {
     text: variant === "dark" ? "text-light-100" : "text-dark-400",
     };
 
-    const onError = (error: any) => {
-      console.log( error);
+    const onError = () => {
+      setProgress(0);
 
       toast({
         title: `${type} Upload Failed`,
@@ -56,17 +59,22 @@ const FileUpload = ( {
       });
     }
 
-    const onSuccess = (res: any) => {
-      setFile(res);
+    const onSuccess = (res: { filePath?: string }) => {
+      if (!res.filePath) {
+        onError();
+        return;
+      }
+      setFile({ filePath: res.filePath });
       onFileChange(res.filePath);
-
-      toast({
-        title: `${type} Upload Successful`,
-        description: `${res.filePath} uploaded successfully.`,
-      });
+      setProgress(100);
+      toast({ title: `${type} Upload Successful`, description: "Your file was uploaded successfully." });
     };
     const onValidate = (file: File) => {
       if (type === "image") {
+        if (!file.type.startsWith("image/")) {
+          toast({ title: "Unsupported file type", description: "Please choose a valid image file.", variant: "destructive" });
+          return false;
+        }
         if (file.size > 20 * 1024 * 1024) {
         toast({
           title: "File size too large",
@@ -77,6 +85,10 @@ const FileUpload = ( {
         return false;
       }
     } else if (type === "video") {
+      if (!file.type.startsWith("video/")) {
+        toast({ title: "Unsupported file type", description: "Please choose a valid video file.", variant: "destructive" });
+        return false;
+      }
       if (file.size > 50 * 1024 * 1024) {
         toast({
           title: "File size too large",
