@@ -46,12 +46,10 @@ const AuthForm = <T extends FieldValues>({
     defaultValues: defaultValues as DefaultValues<T>,
   });
   const handleSubmit: SubmitHandler<T> = async (data) => {
-    console.log("Form submitted with data:", data);
-    const result = await onSubmit(data);
-    console.log("onSubmit result:", result);
+    try {
+      const result = await onSubmit(data);
 
-    if (result.success) {
-      console.log("Signup/signin successful, showing toast and redirecting");
+      if (result.success) {
       toast({
         title: "Success",
         description: isSignIn
@@ -60,11 +58,17 @@ const AuthForm = <T extends FieldValues>({
       });
 
       router.push("/");
-    } else {
-      console.log("Signup/signin failed:", result.error);
+      } else {
+        toast({
+          title: `Error ${isSignIn ? "signing in" : "signing up"}`,
+          description: result.error ?? "An error occurred.",
+          variant: "destructive",
+        });
+      }
+    } catch {
       toast({
         title: `Error ${isSignIn ? "signing in" : "signing up"}`,
-        description: result.error ?? "An error occurred.",
+        description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
     }
