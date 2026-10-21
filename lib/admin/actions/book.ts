@@ -7,8 +7,8 @@ import { eq } from "drizzle-orm";
 import { requireAdmin } from "@/lib/admin/permissions";
 
 export const createBook = async (params: BookParams) => {
+  await requireAdmin();
   try {
-    await requireAdmin();
     const validated = bookSchema.safeParse(params);
     if (!validated.success) {
       return { success: false, message: "Please complete all book fields with valid information" };
@@ -27,8 +27,8 @@ export const createBook = async (params: BookParams) => {
 };
 
 export const updateBook = async (bookId: string, params: BookParams) => {
+  await requireAdmin();
   try {
-    await requireAdmin();
     const validated = bookSchema.safeParse(params);
     if (!validated.success || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(bookId)) {
       return { success: false, message: "Please enter valid book information" };
