@@ -89,13 +89,15 @@ export const signUp = async (params: AuthCredentials) => {
       password: hashedPassword,
     });
 
-    try {
-      await workflowClient.trigger({
-        url: `${config.env.prodApiEndpoint}/api/auth/workflows/onboarding`,
-        body: { email, fullName },
-      });
-    } catch (error) {
-      console.error("Onboarding workflow could not be triggered", error);
+    if (process.env.NODE_ENV === "production" && config.env.prodApiEndpoint) {
+      try {
+        await workflowClient.trigger({
+          url: `${config.env.prodApiEndpoint}/api/auth/workflows/onboarding`,
+          body: { email, fullName },
+        });
+      } catch (error) {
+        console.error("Onboarding workflow could not be triggered", error);
+      }
     }
 
     const signInResult = await signInWithCredentials({ email, password });
