@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 export const signUpSchema = z.object({
-  fullName: z.string().min(3),
-  email: z.string().email(),
-  password: z.string().min(8),
+  fullName: z.string().trim().min(3).max(255),
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
 });
 
 export const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().trim().email().max(254),
+  password: z.string().min(8).max(128),
 });
 
 export const bookSchema = z.object({
