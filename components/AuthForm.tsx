@@ -57,7 +57,7 @@ const AuthForm = <T extends FieldValues>({
         title: "Success",
         description: isSignIn
           ? "You have successfully signed in."
-          : "You have successfully signed up.",
+          : "Your account is created. An administrator must approve it before you can borrow books.",
       });
 
       router.push("/");
@@ -79,7 +79,7 @@ const AuthForm = <T extends FieldValues>({
       <p className="text-light-100">
         {isSignIn
           ? "Access the vast collection of resources, and stay updated"
-          : "Please complete all fields to gain access to the library"}
+          : "Create an account to browse the catalog. Borrowing is enabled after administrator approval."}
       </p>
       <Form {...form}>
         <form
