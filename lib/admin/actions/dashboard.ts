@@ -4,11 +4,11 @@ import { db } from "@/database/drizzle";
 import { books, borrowRecords, users } from "@/database/schema";
 import { and, eq, gt, lt, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { requireDashboardUser } from "@/lib/admin/permissions";
+import { requireAdmin } from "@/lib/admin/permissions";
 import dayjs from "dayjs";
 
 export const updateAccountStatus = async (userId: string, status: "APPROVED" | "REJECTED") => {
-  await requireDashboardUser();
+  await requireAdmin();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return;
   await db.update(users).set({ status }).where(eq(users.id, userId));
   revalidatePath("/admin/users");
@@ -16,7 +16,7 @@ export const updateAccountStatus = async (userId: string, status: "APPROVED" | "
 };
 
 export const returnBorrowedBook = async (recordId: string) => {
-  await requireDashboardUser();
+  await requireAdmin();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(recordId)) return;
   const [record] = await db
     .update(borrowRecords)
@@ -35,7 +35,7 @@ export const returnBorrowedBook = async (recordId: string) => {
 }
 
 export const decideBorrowRequest = async (recordId: string, decision: "APPROVE" | "REJECT") => {
-  await requireDashboardUser();
+  await requireAdmin();
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(recordId)) return;
 
   const [request] = await db.select({ bookId: borrowRecords.bookId })
