@@ -13,7 +13,7 @@ const BookCard = ({
   coverUrl,
   isLoanedBook = false,
   recommendationReason,
-}: Book & { recommendationReason?: string }) => (
+}: Book & { isLoanedBook?: boolean; recommendationReason?: string }) => (
   <li className={cn(isLoanedBook && "xs:w-52 w-full")}>
     <Link
       href={`/books/${id}`}
