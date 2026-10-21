@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 
 export const updateAccountStatus = async (userId: string, status: "APPROVED" | "REJECTED") => {
   await requireAdmin();
+  if (status !== "APPROVED" && status !== "REJECTED") return;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) return;
   await db.update(users).set({ status }).where(eq(users.id, userId));
   revalidatePath("/admin/users");
@@ -36,6 +37,7 @@ export const returnBorrowedBook = async (recordId: string) => {
 
 export const decideBorrowRequest = async (recordId: string, decision: "APPROVE" | "REJECT") => {
   await requireAdmin();
+  if (decision !== "APPROVE" && decision !== "REJECT") return;
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(recordId)) return;
 
   const [request] = await db.select({ bookId: borrowRecords.bookId })
