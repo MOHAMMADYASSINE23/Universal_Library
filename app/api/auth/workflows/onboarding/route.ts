@@ -50,7 +50,7 @@ export const { POST } = serve<InitialData>(async (context) => {
 
 Welcome to Universal Library! We're excited to have you join our community of book lovers.
 
-You can now browse our extensive collection of books, borrow titles, and manage your reading journey.
+You can browse the book catalog now. Before borrowing books, your account must be approved by a library administrator. We'll notify you when your account status changes.
 
 If you have any questions, feel free to reach out to our support team.
 
@@ -77,7 +77,7 @@ The Universal Library Team`,
 
 We noticed you haven't visited Universal Library in a few days. We hope everything is going well!
 
-Remember, you have access to thousands of books waiting for you. Log in anytime to continue your reading journey or discover new titles.
+Log in anytime to browse the catalog and discover books. If you're still waiting for account approval, a library administrator must approve your account before you can borrow books.
 
 If you have any issues with your account, please let us know.
 
