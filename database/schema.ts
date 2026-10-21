@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   varchar,
   uuid,
@@ -10,7 +11,6 @@ import {
   uniqueIndex,
   index,
   check,
-  sql,
 } from "drizzle-orm/pg-core";
 
 export const STATUS_ENUM = pgEnum("status", [
