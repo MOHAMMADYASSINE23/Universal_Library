@@ -3,59 +3,51 @@ import { db } from "./database/drizzle";
 import { users } from "./database/schema";
 import { eq } from "drizzle-orm";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {compare}  from "bcryptjs";
-
+import { compare } from "bcryptjs";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-   session: { strategy: "jwt" },
-   providers: [
+  session: { strategy: "jwt" },
+  providers: [
     CredentialsProvider({
-        async authorize(credentials) {
-            if (!credentials?.email || !credentials?.password) {
-                return null;
-            }
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) return null;
 
-            const user = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, credentials.email.toString()))
-            .limit(1);
+        const [user] = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, credentials.email.toString().trim().toLowerCase()))
+          .limit(1);
 
-          if (user.length === 0) return null;
+        if (!user) return null;
 
-          const isPasswordValid = await compare(
-            credentials.password.toString(),
-            user[0].password,
-          );
-           
-        if (!isPasswordValid) return null;
+        const isPasswordValid = await compare(credentials.password.toString(), user.password);
+        if (!isPasswordValid || user.status !== "APPROVED") return null;
 
         return {
-          id: user[0].id.toString(),
-          email: user[0].email,
-          name: user[0].fullName,
+          id: user.id.toString(),
+          email: user.email,
+          name: user.fullName,
+          role: user.role ?? "USER",
         } as User;
       },
     }),
   ],
-  pages: {
-    signIn: "/sign-in",
-  },
+  pages: { signIn: "/sign-in" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
+        token.role = user.role ?? "USER";
       }
-
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.name = token.name as string;
+        session.user.name = token.name;
+        session.user.role = token.role === "ADMIN" ? "ADMIN" : "USER";
       }
-
       return session;
     },
   },
