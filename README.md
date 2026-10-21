@@ -110,6 +110,7 @@ Open http://localhost:3000.
 
 ```bash
 npx tsc --noEmit
+npm test
 npm run lint
 npm run build
 ```
@@ -124,7 +125,7 @@ GitHub Actions runs these checks on pushes and pull requests to `main`. The buil
 - ImageKit upload credentials are only issued to authenticated administrators.
 - Rate limiting helps reduce abuse but is not a complete DDoS protection system.
 - Email and background workflow delivery depends on external provider configuration.
-- This repository does not currently include an automated integration-test suite. Test account approval, borrowing, returns, uploads, and workflow delivery with non-production credentials before deploying changes.
+- Automated unit tests cover core authentication, book, and review input validation. A full database-backed integration suite is not yet included. Test account approval, borrowing, returns, uploads, and workflow delivery with non-production credentials before deploying changes.
 
 ## License
 
