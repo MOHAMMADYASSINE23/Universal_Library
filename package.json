@@ -10,7 +10,8 @@
     "seed": "npx dotenv -e .env.local -- npx tsx database/seed.ts",
     "db:generate": "npx dotenv -e .env.local -- npx drizzle-kit generate",
     "db:migrate": "npx dotenv -e .env.local -- npx drizzle-kit migrate",
-    "db:studio": "npx dotenv -e .env.local -- npx drizzle-kit studio"
+    "db:studio": "npx dotenv -e .env.local -- npx drizzle-kit studio",
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@emailjs/nodejs": "^5.0.2",
