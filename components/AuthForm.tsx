@@ -7,10 +7,9 @@ import {
   Path,
   SubmitHandler,
   useForm,
-  UseFormReturn,
   Resolver,
 } from "react-hook-form";
-import { ZodType, ZodTypeAny } from "zod";
+import { ZodType } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -42,8 +41,8 @@ const AuthForm = <T extends FieldValues>({
 }: Props<T>) => {
   const router = useRouter();
   const isSignIn = type === "SIGN_IN";
-  const form = useForm<T>({
-    resolver: zodResolver(schema as unknown as ZodTypeAny),
+  const form = useForm<T, unknown, T>({
+    resolver: zodResolver(schema as never) as Resolver<T, unknown, T>,
     defaultValues: defaultValues as DefaultValues<T>,
   });
   const handleSubmit: SubmitHandler<T> = async (data) => {
