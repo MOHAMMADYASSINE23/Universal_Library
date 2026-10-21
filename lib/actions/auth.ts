@@ -6,82 +6,106 @@ import { users } from "@/database/schema";
 import { hash } from "bcryptjs";
 import { signIn } from "@/auth";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { workflowClient } from "@/lib/workflow";
 import config from "@/lib/config";
+import ratelimit from "@/lib/ratelimit";
+import { signUpSchema, signInSchema } from "@/lib/validations";
 
-export const signInWithCredentials = async ( params: Pick<AuthCredentials, "email" | "password">,) => {
-     const { email, password } = params;
+const getClientIp = async () => {
+  const requestHeaders = await headers();
+  const forwardedFor = requestHeaders.get("x-forwarded-for");
+  return requestHeaders.get("x-real-ip") || forwardedFor?.split(",")[0]?.trim() || "unknown";
+};
 
-    
-    try{
-        const result = await signIn("credentials", {
-            email,
-            password,
-            redirect: false,
-        });
-        if (result?.error) {
-            return { success: false, error: result.error };
-        }
-        return { success: true };
-    } catch (error) {
-        console.log(error, "signin error");
-        return { success: false, error: "sigin error"};
+export const signInWithCredentials = async (
+  params: Pick<AuthCredentials, "email" | "password">,
+) => {
+  const validated = signInSchema.safeParse({
+    email: typeof params?.email === "string" ? params.email.trim().toLowerCase() : "",
+    password: typeof params?.password === "string" ? params.password : "",
+  });
+
+  if (!validated.success) {
+    return { success: false, error: "Enter a valid email and password." };
+  }
+
+  try {
+    const { success: withinLimit } = await ratelimit.limit(`signin:${await getClientIp()}`);
+    if (!withinLimit) {
+      return { success: false, error: "Too many sign-in attempts. Please wait a minute and try again." };
     }
+
+    const result = await signIn("credentials", {
+      email: validated.data.email,
+      password: validated.data.password,
+      redirect: false,
+    });
+
+    if (result?.error) {
+      return { success: false, error: "Email or password is incorrect, or your account is not available." };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Sign-in failed", error);
+    return { success: false, error: "Could not sign in right now. Please try again." };
+  }
 };
 
 export const signUp = async (params: AuthCredentials) => {
-     const { fullName, email, password } = params;
+  const validated = signUpSchema.safeParse({
+    fullName: typeof params?.fullName === "string" ? params.fullName.trim() : "",
+    email: typeof params?.email === "string" ? params.email.trim().toLowerCase() : "",
+    password: typeof params?.password === "string" ? params.password : "",
+  });
 
-     console.log("SignUp called with:", { fullName, email });
+  if (!validated.success) {
+    return { success: false, error: "Enter a valid name, email address, and password of at least 8 characters." };
+  }
 
-     // const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
-     // const { success } = await ratelimit.limit(ip);
+  const { fullName, email, password } = validated.data;
 
-     // if (!success) return redirect("/too-fast");
+  try {
+    const { success: withinLimit } = await ratelimit.limit(`signup:${await getClientIp()}`);
+    if (!withinLimit) {
+      return { success: false, error: "Too many account requests. Please wait a minute and try again." };
+    }
 
-     const existingUser = await db
-            .select()
-            .from(users)
-            .where(eq(users.email, email))
-            .limit(1);
+    const [existingUser] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
 
-     console.log("Existing user check:", existingUser.length);
+    if (existingUser) {
+      return { success: false, error: "An account with this email already exists." };
+    }
 
-     if (existingUser.length > 0) {
-        console.log("User already exists");
-        return { success: false, error: "User already exists" };
-     }
+    const hashedPassword = await hash(password, 10);
 
-     const hashedPassword = await hash(password, 10);
+    await db.insert(users).values({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
 
-     try{
-        console.log("Inserting user");
-        await db.insert(users).values({
-            fullName,
-            email,
-            password: hashedPassword,
-        });
-        console.log("User inserted successfully");
+    try {
+      await workflowClient.trigger({
+        url: `${config.env.prodApiEndpoint}/api/auth/workflows/onboarding`,
+        body: { email, fullName },
+      });
+    } catch (error) {
+      console.error("Onboarding workflow could not be triggered", error);
+    }
 
-        try {
-            await workflowClient.trigger({
-                url: `${config.env.prodApiEndpoint}/api/auth/workflows/onboarding`,
-                body: { email, fullName,},
-            });
-            console.log("Workflow triggered");
-        } catch (error) {
-            console.log("Workflow trigger failed:", error);
-            // Don't fail signup if workflow fails
-        }
+    const signInResult = await signInWithCredentials({ email, password });
+    if (!signInResult.success) {
+      return { success: true };
+    }
 
-        console.log("Calling signInWithCredentials");
-        await signInWithCredentials({ email, password });
-        console.log("Sign in successful");
-
-        return { success: true };
-     } catch (error) {
-        console.log(error, "signup error");
-        return { success: false, error: "signup error"};
-     }
-     }
+    return { success: true };
+  } catch (error) {
+    console.error("Sign-up failed", error);
+    return { success: false, error: "Could not create your account. Please try again." };
+  }
+};
