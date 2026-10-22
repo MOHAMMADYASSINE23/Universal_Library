@@ -30,7 +30,7 @@ A full-stack library management app for discovering books, requesting loans, tra
 
 | Area | Technology |
 | --- | --- |
-| Application | Next.js 14 App Router, React 18, TypeScript |
+| Application | Next.js 15 App Router, React 19, TypeScript |
 | Authentication | Auth.js / NextAuth credentials provider, JWT sessions, bcrypt |
 | Database | PostgreSQL on Neon, Drizzle ORM |
 | Validation | Zod, React Hook Form |
@@ -108,12 +108,17 @@ Open http://localhost:3000.
 
 ## Quality checks
 
+Run the automated checks before opening a pull request:
+
 ```bash
+npm ci
 npx tsc --noEmit
 npm test
 npm run lint
 npm run build
 ```
+
+For real-user-flow verification, follow the [end-to-end smoke-test checklist](docs/production-smoke-test.md). Use a non-production database and test credentials for all integration checks.
 
 GitHub Actions runs these checks on pushes and pull requests to `main`. The build workflow uses placeholder environment values only; it does not connect to a production database or send real emails.
 
@@ -125,7 +130,7 @@ GitHub Actions runs these checks on pushes and pull requests to `main`. The buil
 - ImageKit upload credentials are only issued to authenticated administrators.
 - Rate limiting helps reduce abuse but is not a complete DDoS protection system.
 - Email and background workflow delivery depends on external provider configuration.
-- Automated unit tests cover core authentication, book, and review input validation. A full database-backed integration suite is not yet included. Test account approval, borrowing, returns, uploads, and workflow delivery with non-production credentials before deploying changes.
+- Automated unit tests cover core authentication, book, and review input validation. A full database-backed integration suite is not yet included. The [end-to-end smoke-test checklist](docs/production-smoke-test.md) documents the critical manual checks to run with non-production credentials before deploying changes.
 
 ## License
 
