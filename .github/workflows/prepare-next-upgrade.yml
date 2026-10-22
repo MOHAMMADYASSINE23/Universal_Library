@@ -28,10 +28,8 @@ jobs:
           cache: npm
       - name: Resolve upgraded dependencies
         run: npm install --no-audit --no-fund
-      - name: Migrate Next.js request APIs
-        env:
-          CI: "true"
-        run: timeout 300s npx --yes @next/codemod@canary next-async-request-api app components lib database auth.ts --extensions=ts,tsx,js,jsx --run-in-band
+      - name: Keep dependency lockfile update isolated
+        run: echo "Dependency lockfile regenerated; source migration will be handled in a reviewed follow-up."
       - name: Commit generated migration and lockfile
         run: |
           git config user.name "github-actions[bot]"
