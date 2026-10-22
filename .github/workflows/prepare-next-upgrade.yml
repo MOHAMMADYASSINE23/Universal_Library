@@ -9,12 +9,13 @@ permissions:
   contents: write
 
 concurrency:
-  group: next-upgrade-${{ github.ref }}
+  group: next-upgrade-${{ github.ref }}-${{ github.sha }}
   cancel-in-progress: false
 
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
       - name: Check out upgrade branch
         uses: actions/checkout@v4
@@ -28,7 +29,9 @@ jobs:
       - name: Resolve upgraded dependencies
         run: npm install --no-audit --no-fund
       - name: Migrate Next.js request APIs
-        run: npx --yes @next/codemod@canary next-async-request-api . --force
+        env:
+          CI: "true"
+        run: timeout 300s npx --yes @next/codemod@canary next-async-request-api . --force
       - name: Commit generated migration and lockfile
         run: |
           git config user.name "github-actions[bot]"
