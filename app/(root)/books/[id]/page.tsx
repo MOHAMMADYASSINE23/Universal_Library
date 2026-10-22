@@ -8,7 +8,7 @@ import BookOverview from "@/components/BookOverview";
 import BookVideo from "@/components/BookVideo";
 import BookReviews from "@/components/BookReviews";
 
-const Page = async ({ params }: { params: { id: string } }) => {
+const Page = async ({ params }: { params: Promise<{ id: string }> }) => {
     const id = (await params).id;
 
     // Book IDs are UUIDs in the database. Reject stale or malformed links
