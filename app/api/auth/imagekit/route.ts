@@ -13,12 +13,16 @@ const {
 } = config;
 
 const imagekit = new ImageKit({ publicKey, privateKey, urlEndpoint });
+const noStoreHeaders = { "Cache-Control": "private, no-store, max-age=0" };
 
 export async function GET() {
   const session = await auth();
 
   if (!session?.user?.id) {
-    return NextResponse.json({ message: "Authentication required." }, { status: 401 });
+    return NextResponse.json(
+      { message: "Authentication required." },
+      { status: 401, headers: noStoreHeaders },
+    );
   }
 
   const [account] = await db
@@ -28,8 +32,13 @@ export async function GET() {
     .limit(1);
 
   if (account?.role !== "ADMIN") {
-    return NextResponse.json({ message: "Administrator access required." }, { status: 403 });
+    return NextResponse.json(
+      { message: "Administrator access required." },
+      { status: 403, headers: noStoreHeaders },
+    );
   }
 
-  return NextResponse.json(imagekit.getAuthenticationParameters());
+  return NextResponse.json(imagekit.getAuthenticationParameters(), {
+    headers: noStoreHeaders,
+  });
 }
