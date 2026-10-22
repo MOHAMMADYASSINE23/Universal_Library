@@ -1,0 +1,42 @@
+name: Prepare Next.js security upgrade
+
+on:
+  push:
+    branches:
+      - security/next-15-migration
+
+permissions:
+  contents: write
+
+concurrency:
+  group: next-upgrade-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out upgrade branch
+        uses: actions/checkout@v4
+        with:
+          ref: security/next-15-migration
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Resolve upgraded dependencies
+        run: npm install --no-audit --no-fund
+      - name: Migrate Next.js request APIs
+        run: npx --yes @next/codemod@canary next-async-request-api . --force
+      - name: Commit generated migration and lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No generated changes to commit."
+            exit 0
+          fi
+          git commit -m "chore: regenerate dependencies and migrate Next.js request APIs"
+          git push origin security/next-15-migration
