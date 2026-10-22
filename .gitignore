@@ -35,5 +35,5 @@ yarn-error.log*
 next-env.d.ts
 # Prevent accidentally committing Git metadata copied into the project root.
 /HEAD
-/hooks/
+/hooks/*.sample
 /info/
