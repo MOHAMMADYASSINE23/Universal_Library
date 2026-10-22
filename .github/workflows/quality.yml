@@ -51,6 +51,8 @@ jobs:
         run: |
           npm audit --json > npm-audit.json || true
           node -e 'const a = require("./npm-audit.json"); console.log(JSON.stringify({metadata: a.metadata?.vulnerabilities, vulnerabilities: Object.entries(a.vulnerabilities || {}).map(([name, v]) => ({name, severity: v.severity, isDirect: v.isDirect, range: v.range, fixAvailable: v.fixAvailable}))}, null, 2))'
+          npm audit --omit=dev --json > npm-audit-production.json || true
+          node -e 'const a = require("./npm-audit-production.json"); console.log("Production dependency audit:", JSON.stringify(a.metadata?.vulnerabilities || a.error || {}, null, 2))'
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Unit tests
