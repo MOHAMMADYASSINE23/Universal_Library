@@ -31,7 +31,7 @@ jobs:
       - name: Migrate Next.js request APIs
         env:
           CI: "true"
-        run: timeout 300s npx --yes @next/codemod@canary next-async-request-api . --force
+        run: timeout 300s npx --yes @next/codemod@canary next-async-request-api app components lib database auth.ts --extensions=ts,tsx,js,jsx --run-in-band
       - name: Commit generated migration and lockfile
         run: |
           git config user.name "github-actions[bot]"
