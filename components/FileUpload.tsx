@@ -102,10 +102,26 @@ const FileUpload = ( {
     return true;
   };
   return (
+    const authenticator = async () => {
+    const response = await fetch("/api/auth/imagekit", {
+      method: "GET",
+      cache: "no-store",
+      credentials: "same-origin",
+    });
+
+    if (!response.ok) {
+      throw new Error("Unable to authorize this upload.");
+    }
+
+    return response.json();
+  };
+
+  return (
     <ImageKitProvider
       publicKey={publicKey}
       urlEndpoint={urlEndpoint}
-      >
+      authenticator={authenticator}
+    >
       <IKUpload
         ref={ikUploadRef}
         onError={onError}
