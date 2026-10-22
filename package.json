@@ -62,8 +62,6 @@
   },
   "overrides": {
     "postcss": "^8.5.31",
-    "braces": "^3.0.4",
-    "source-map-js": "^1.2.2",
-    "chokidar": "^3.6.1"
+    "source-map-js": "^1.2.2"
   }
 }
