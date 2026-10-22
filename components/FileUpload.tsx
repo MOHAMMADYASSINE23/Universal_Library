@@ -1,17 +1,13 @@
 "use client";
 
 import { IKImage, ImageKitProvider, IKUpload, IKVideo } from "imagekitio-next";
-import config from "@/lib/config";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-const {
-  env: {
-    imagekit: { publicKey, urlEndpoint },
-  },
-} = config;
+const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!;
+const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!;
 
 
 interface Props {
@@ -139,6 +135,7 @@ const FileUpload = ( {
       />
 
       <button
+        type="button"
         className={cn("upload-btn", styles.button)}
         onClick={(e) => {
           e.preventDefault();
