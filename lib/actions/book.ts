@@ -36,7 +36,7 @@ export const borrowBook = async (params: BorrowBookParams) => {
         const [existingRequest] = await db.select({ id: borrowRecords.id })
             .from(borrowRecords)
             .where(and(
-                eq(borrowRecords.userId, userId),
+                eq(borrowRecords.userId, session.user.id),
                 eq(borrowRecords.bookId, bookId),
                 or(eq(borrowRecords.status, "PENDING"), eq(borrowRecords.status, "BORROWED")),
             ))
@@ -49,7 +49,7 @@ export const borrowBook = async (params: BorrowBookParams) => {
 
         const record = await db.insert(borrowRecords).values({
             bookId,
-            userId,
+            userId: session.user.id,
             dueDate,
             status: "PENDING",
         });
@@ -58,9 +58,7 @@ export const borrowBook = async (params: BorrowBookParams) => {
             success: true,
             data: JSON.parse(JSON.stringify(record)),
         };
-    } catch (error) {
-        console.log(error);
-
+    } catch {
         return {
             success: false,
             error: "An error occurred while borrowing the book",
