@@ -15,15 +15,21 @@ test("sign-up accepts valid details and trims name/email", () => {
   }
 });
 
-test("sign-up rejects invalid email and short password", () => {
+test("sign-up rejects invalid email and passwords outside the allowed length", () => {
   assert.equal(signUpSchema.safeParse({
     fullName: "Reader Name",
     email: "not-an-email",
     password: "short",
   }).success, false);
+
+  assert.equal(signUpSchema.safeParse({
+    fullName: "Reader Name",
+    email: "reader@example.com",
+    password: "p".repeat(129),
+  }).success, false);
 });
 
-test("sign-up rejects excessively long values", () => {
+test("sign-up rejects excessively long names", () => {
   assert.equal(signUpSchema.safeParse({
     fullName: "A".repeat(256),
     email: "reader@example.com",
@@ -31,9 +37,13 @@ test("sign-up rejects excessively long values", () => {
   }).success, false);
 });
 
-test("sign-in rejects malformed credentials", () => {
+test("sign-in rejects malformed credentials and passwords over the limit", () => {
   assert.equal(signInSchema.safeParse({ email: "invalid", password: "password123" }).success, false);
   assert.equal(signInSchema.safeParse({ email: "reader@example.com", password: "x" }).success, false);
+  assert.equal(signInSchema.safeParse({
+    email: "reader@example.com",
+    password: "p".repeat(129),
+  }).success, false);
 });
 
 test("book schema rejects invalid copy counts and ratings", () => {
@@ -86,4 +96,23 @@ test("book review requires a UUID, rating from 1 to 5, and a useful review", () 
     rating: 5,
     review: "This book was genuinely useful and enjoyable.",
   }).success, true);
+});
+
+test("book review validates the trimmed review length", () => {
+  const bookId = "550e8400-e29b-41d4-a716-446655440000";
+
+  assert.equal(bookReviewSchema.safeParse({
+    bookId,
+    rating: 5,
+    review: "         ",
+  }).success, false);
+
+  const result = bookReviewSchema.safeParse({
+    bookId,
+    rating: 5,
+    review: "  This review has enough useful detail.  ",
+  });
+
+  assert.equal(result.success, true);
+  if (result.success) assert.equal(result.data.review, "This review has enough useful detail.");
 });
