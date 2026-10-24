@@ -47,12 +47,12 @@ export const borrowBook = async (params: BorrowBookParams) => {
 
         const dueDate = dayjs().add(7, "day").format("YYYY-MM-DD");
 
-        const record = await db.insert(borrowRecords).values({
+        const [record] = await db.insert(borrowRecords).values({
             bookId,
             userId: session.user.id,
             dueDate,
             status: "PENDING",
-        });
+        }).returning();
 
         return {
             success: true,
