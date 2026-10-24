@@ -122,6 +122,10 @@ For real-user-flow verification, follow the [end-to-end smoke-test checklist](do
 
 GitHub Actions runs these checks on pushes and pull requests to `main`. The build workflow uses placeholder environment values only; it does not connect to a production database or send real emails.
 
+### Dependency audit status
+
+The latest CI run reports **0 production dependency vulnerabilities**. The full development dependency tree still reports 14 findings (7 high, 7 moderate, 0 critical), concentrated in build/lint tooling such as the Next.js ESLint configuration, Tailwind CSS 3, and Drizzle Kit. Some automated remediations require incompatible major-version changes or are not available, so these findings need a deliberate tooling migration rather than a blind `npm audit fix`. Recheck the current CI audit before release; audit results can change as advisories are published.
+
 ## Security and current scope
 
 - Administrator pages and server actions verify the account's current database role. Being signed in alone does not grant administrative permissions.
