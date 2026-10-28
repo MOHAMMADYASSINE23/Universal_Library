@@ -31,7 +31,7 @@
     "imagekit": "^6.0.0",
     "imagekitio-next": "^1.0.1",
     "lucide-react": "^0.400.0",
-    "next": "15.5.28",
+    "next": "16.4.3",
     "next-auth": "5.0.0-beta.32",
     "postgres": "^3.4.9",
     "react": "^19.3.0",
